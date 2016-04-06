@@ -63,15 +63,17 @@ int main(int argc, const char * argv[]) {
         fprintf(stderr, "connection failed");
     }
     
-    char buffer[80];
-    for (int i = 0; i < 80; i++) {
-        buffer[i] = 'a' + i % 10;
+    string msg;
+    while (getline(cin, msg)) {
+        /* send the message, use endline as deliminator */
+        int _size = msg.size() + 1; // null-terminated character
+        msg = to_string(_size) + '-' + msg;
+
+        if ((send(soc_client, msg.c_str(), msg.size(), 0)) == -1) {
+            fprintf(stderr, "send failed\n");
+        }
     }
-    
-    /* send the message */
-    if ((send(soc_client, buffer, strlen(buffer), 0)) == -1) {
-        fprintf(stderr, "send failed\n");
-    }
+
     
     close(soc_client);
     freeaddrinfo(res); // free the linked list

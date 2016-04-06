@@ -1,4 +1,5 @@
 
+all_new: server_new client_new
 server_new: clean_server server
 client_new: clean_client client
 server:
