@@ -1,7 +1,12 @@
 
-all: clean test
-test:
-	g++ server.cpp -o test
+server_new: clean_server server
+client_new: clean_client client
+server:
+	g++ server.cpp -o server
+client:
+	g++ client.cpp -o client
 
-clean:
-	rm test
+clean_server:
+	rm server
+clean_client:
+	rm client

@@ -28,15 +28,14 @@ int main(int argc, const char * argv[]) {
         return 1;
     }
     memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC; // AF_INET or AF_INET6 to force version
+    hints.ai_family = AF_INET; // AF_INET or AF_INET6 to force version
     hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = AI_PASSIVE;    // fill in my ip for me
-
-    if ((status = getaddrinfo(nullptr, _port.c_str(), &hints, &res)) != 0) {
+    
+    if ((status = getaddrinfo("localhost", _port.c_str(), &hints, &res)) != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
         return 2;
     }
-    printf("IP addresses for %s:\n\n", argv[1]);
+    printf("Target IP addresses for %s:\n\n", argv[1]);
     
     p = res;
     if (p != nullptr) {
@@ -58,46 +57,23 @@ int main(int argc, const char * argv[]) {
     }
     
     /* addrinfo *p is important !! */
-    int soc_server = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+    int soc_client = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
     
-    if ((bind(soc_server, p->ai_addr, p->ai_addrlen)) != 0) {
-        fprintf(stderr, "bind error");
+    if((connect(soc_client, res->ai_addr, res->ai_addrlen)) == -1){
+        fprintf(stderr, "connection failed");
     }
     
-    /* a server must 1. listen() 2. accept() */
-    if (listen(soc_server, 2) != 0){
-        fprintf(stderr, "listen error\n");        
-    }    
-
-    struct sockaddr_storage their_addr;
-    socklen_t addr_size = sizeof(their_addr);
-
-    int soc_request;
-    while (soc_request = accept(soc_server, (struct sockaddr *)&their_addr, &addr_size)) {
-        
-        /* accept extracts the first pending request on the waiting queue of listening socket
-         if none present, it will block (unless non-blocking is specified) */
-        
-        struct sockaddr client_addr;
-        getpeername(soc_request, &client_addr, (socklen_t*)sizeof(&client_addr));
-        cout << "client:: " << client_addr.sa_data << "\n";
-        
-        
-        int data_byte_remain = -1;
-        char buffer[10];
-        while((data_byte_remain = recv(soc_request, buffer, sizeof(buffer), 0)) != 0){
-            if (data_byte_remain == -1)
-            {
-                fprintf(stderr, "receive error\n");
-                break;
-            }
-            cout << data_byte_remain << "  received :: " << buffer << "\n";
-        }
-        close(soc_request);
+    char buffer[80];
+    for (int i = 0; i < 80; i++) {
+        buffer[i] = 'a' + i % 10;
     }
-
     
-    close(soc_server);
+    /* send the message */
+    if ((send(soc_client, buffer, strlen(buffer), 0)) == -1) {
+        fprintf(stderr, "send failed\n");
+    }
+    
+    close(soc_client);
     freeaddrinfo(res); // free the linked list
     return 0;
 }
