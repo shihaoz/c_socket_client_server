@@ -34,7 +34,7 @@ int tcp_send(int p_socket_client, string message){
     return 0;
 }
 
-int tcp_receive(int p_socket, string& message){
+int tcp_receive(int p_socket, string& message, bool confirm){
     int data_byte_remain = -1;
     const int _buffer_size = 10;
     char buffer[_buffer_size];
@@ -53,7 +53,7 @@ int tcp_receive(int p_socket, string& message){
     int packet_size = atoi(message.c_str());
     int total_receive = 0;
     
-    cout << "package size: " << packet_size << "\n";
+    //cout << "package size: " << packet_size << "\n";
     message.clear();
     message.reserve(packet_size);
     
@@ -65,11 +65,14 @@ int tcp_receive(int p_socket, string& message){
         idx = 0;
     } while (total_receive < packet_size && recv(p_socket, buffer, sizeof(buffer), 0));
     
-    if(tcp_send(p_socket, to_string(packet_size)+" received") == -1){
-        cerr << "error responding to client \n";
-        return -1;
+    if (confirm == true) {
+        /* send a confirmation message */
+        if(tcp_send(p_socket, to_string(packet_size)+" received") == -1){
+            cerr << "error responding to client \n";
+            return -1;
+        }
     }
-    
+
     return 0;
 }
 
@@ -162,7 +165,7 @@ int tcp_server_bind(int p_port, int p_ip_version){
     if (setsockopt(socket_server, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
         perror("setsockopt");   exit(1);
     }
-    if ((bind(socket_server, p->ai_addr, p->ai_addrlen)) != 0) {
+    if ((::bind(socket_server, p->ai_addr, p->ai_addrlen)) != 0) {
         cerr << "bind error";
     }
     

@@ -27,7 +27,7 @@ int main(int argc, const char * argv[]) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
         return 2;
     }
-    printf("Target IP addresses for %s:\n\n", argv[1]);
+    printf("Target IP addresses for %s:\n", argv[1]);
     
     p = res;
     if (p != nullptr) {
@@ -47,7 +47,7 @@ int main(int argc, const char * argv[]) {
             cout << ":: IPv6: " << ip_readable << "\n";
         }
     }
-    
+    cout << "\n\n";
     /* addrinfo *p is important !! */
     int soc_client = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
     
@@ -56,6 +56,7 @@ int main(int argc, const char * argv[]) {
     }
     
     string msg;
+    cout << "me: " << "\n";
     while (getline(cin, msg)) {
         /* send the message, use endline as deliminator */
         if (msg.empty()) {
@@ -65,13 +66,13 @@ int main(int argc, const char * argv[]) {
             cerr << "send failed";
             exit(1);
         }
-        cout << "me: " << msg << "\n";
+
         msg.clear();
-        if ((tcp_receive(soc_client, msg)) == -1) {
+        if ((tcp_receive(soc_client, msg, false)) == -1) {
             cerr << "confirmation received fail";
             exit(1);
         }
-        cout << "bot: " << msg << "\n";
+        cout << "bot: \n" << msg << "\n";
     }
 
     

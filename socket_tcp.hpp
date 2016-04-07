@@ -54,7 +54,7 @@ int tcp_server_bind(int p_port, int p_ip_version=AF_INET);
  success: 0
  failure: -1
  */
-int tcp_receive(int p_socket, string& message);
+int tcp_receive(int p_socket, string& message, bool confirm=true);
 /**
  @param  an established socket, message
  @return

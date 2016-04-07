@@ -29,9 +29,6 @@ int main(int argc, const char * argv[]) {
         /* accept extracts the first pending request on the waiting queue of listening socket
          if none present, it will block (unless non-blocking is specified) */
         
-        int data_byte_remain = -1;
-        const int _buffer_size = 10;
-        char buffer[_buffer_size];
         string msg;
         
         while(1){
