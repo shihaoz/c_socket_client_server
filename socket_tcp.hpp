@@ -23,20 +23,20 @@ using namespace std;
 
 /**
  @param target host name, target port, ip version (AF_INET or AF_INET6)
-
+ 
  @return
  success: socket descriptor
  failure: -1
  
  @description
- creates a socket that connects to target host via port. 
+ creates a socket that connects to target host via port.
  ready to send()/recv()
  */
 int tcp_client_connect(string p_host, int p_port, int p_ip_version);
 
-/** 
+/**
  @param ip version, port number
-
+ 
  @return
  success: socket descriptor
  failure: -1
@@ -50,16 +50,20 @@ int tcp_server_bind(int p_port, int p_ip_version=AF_INET);
 
 /**
  @param an established socket, an empty message
- @return 
+ @return
  success: 0
  failure: -1
  */
-int tcp_receive(int p_socket, string& message, bool confirm=true);
+int tcp_receive(int p_socket, string& message, bool confirm);
+
 /**
  @param  an established socket, message
  @return
- success: 0 
+ success: 0
  failure: -1
  */
 int tcp_send(int p_socket, string message);
+
+
+int tcp_info_socket(int p_socket);
 #endif /* socket_tcp_hpp */

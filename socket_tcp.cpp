@@ -148,14 +148,14 @@ int tcp_server_bind(int p_port, int p_ip_version){
             ip_addr = (struct sockaddr_in*) p->ai_addr;
             char ip_readable[INET6_ADDRSTRLEN];
             inet_ntop(p->ai_family, &ip_addr->sin_addr, ip_readable, sizeof(ip_readable));
-            cout << ":: IPv4: " << ip_readable << "\n";
+            cout << " IPv4: " << ip_readable << "\n";
         }
         else{/* ipv6 */
             struct sockaddr_in6 *ip6_addr;
             ip6_addr = (struct sockaddr_in6*) p->ai_addr;
             char ip_readable[INET6_ADDRSTRLEN];
             inet_ntop(p->ai_family, &ip6_addr->sin6_addr, ip_readable, sizeof(ip_readable));
-            cout << ":: IPv6: " << ip_readable << "\n";
+            cout << " IPv6: " << ip_readable << "\n";
         }
     }
     
@@ -173,3 +173,39 @@ int tcp_server_bind(int p_port, int p_ip_version){
     
     return socket_server;
 }
+
+
+int tcp_info_socket(int p_socket){
+    struct sockaddr_storage holder;
+    socklen_t size = sizeof(holder);
+    
+    if ((getsockname(p_socket, (struct sockaddr*)&holder, &size)) == -1) {
+        return -1;
+    }
+    
+    switch (holder.ss_family) {
+        case AF_INET:
+        { /* IP v4 */
+            struct sockaddr_in* tmp = (struct sockaddr_in*)&holder;
+            char ip_readable[INET_ADDRSTRLEN];
+            inet_ntop(p_socket, &tmp->sin_addr, ip_readable, sizeof(ip_readable));
+            cout << " socket IPv4: " << ip_readable << "\n";
+            cout << "port: " << ntohs(tmp->sin_port) << "\n";
+            break;
+        }
+        case AF_INET6:
+        {
+            struct sockaddr_in6* tmp = (struct sockaddr_in6*)&holder;
+            char ip_readable[INET6_ADDRSTRLEN];
+            inet_ntop(p_socket, &tmp->sin6_addr, ip_readable, sizeof(ip_readable));
+            cout << " socket IPv6: " << ip_readable << "\n";
+            cout << "port: " << ntohs(tmp->sin6_port) << "\n";
+            break;
+        }
+        default:
+            return -1;
+    }
+    return 0;
+}
+
+

@@ -13,7 +13,21 @@ const int _port = 3490;
 
 int main(int argc, const char * argv[]) {
 
-    int soc_server = tcp_server_bind(_port, AF_INET);
+    int soc_server = tcp_server_bind(0);
+    
+    struct sockaddr_in local;
+    int local_length = sizeof(local);
+    memset(&local, 0, local_length);
+    
+    if ((getsockname(soc_server, (struct sockaddr*)&local, (socklen_t*)&local_length)) == -1) {
+        perror("get socket name failed");
+        exit(1);
+    }
+    char hostname[INET_ADDRSTRLEN];
+    socklen_t hostname_len = INET_ADDRSTRLEN;
+    inet_ntop(AF_INET, &(local.sin_addr), hostname, hostname_len);
+    cout << "server IP: "<< hostname << "\n";
+    cout << "port: " << ntohs(local.sin_port) << "\n";
     
     /* a server must 1. listen() 2. accept() */
     if (listen(soc_server, 2) != 0){
@@ -33,7 +47,7 @@ int main(int argc, const char * argv[]) {
         
         while(1){
             msg.clear();
-            if((tcp_receive(soc_request, msg)) == -1){
+            if((tcp_receive(soc_request, msg, true)) == -1){
                 cerr << "receive failed, connection ending\n";
                 exit(1);
             }
