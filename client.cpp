@@ -61,7 +61,17 @@ int main(int argc, const char * argv[]) {
         if (msg.empty()) {
             continue;
         }
-        tcp_send(soc_client, msg);
+        if((tcp_send(soc_client, msg)) == -1){
+            cerr << "send failed";
+            exit(1);
+        }
+        cout << "me: " << msg << "\n";
+        msg.clear();
+        if ((tcp_receive(soc_client, msg)) == -1) {
+            cerr << "confirmation received fail";
+            exit(1);
+        }
+        cout << "bot: " << msg << "\n";
     }
 
     
