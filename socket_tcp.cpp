@@ -12,12 +12,14 @@
  */
 static int sendall(int p_socket_client, const char* message_encoded, int message_size){
     int total_sent = 0; int byte_send = -1;
+    int num_sent = 0;
     while (total_sent < message_size) {
-        if ((byte_send = send(p_socket_client, message_encoded, message_size - total_sent + 1, 0)) == -1) {
+        if ((byte_send = send(p_socket_client, message_encoded, message_size - total_sent, 0)) == -1) {
             perror("send fail");
             return -1;
         }
         total_sent += byte_send;
+        cout << ++num_sent << " packaet sent, " << message_size - total_sent << " left\n";
         message_encoded += byte_send;
     }
     
@@ -25,7 +27,7 @@ static int sendall(int p_socket_client, const char* message_encoded, int message
 }
 
 int tcp_send(int p_socket_client, string message){
-    /* add the size of message, separated by a '-'*/
+    /* add the size of me ssage, separated by a '-'*/
     string msg = to_string(message.size()) + '-' + message;
     
     if(sendall(p_socket_client, msg.c_str(), msg.size()) == -1){
@@ -38,6 +40,7 @@ int tcp_receive(int p_socket, string& message, bool confirm){
     int data_byte_remain = -1;
     const int _buffer_size = 10;
     char buffer[_buffer_size];
+    bzero(buffer, sizeof(buffer));
     
     data_byte_remain = recv(p_socket, buffer, sizeof(buffer), 0);
     if (data_byte_remain == -1){
