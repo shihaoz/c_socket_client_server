@@ -5,15 +5,7 @@
 //  Created by Shihao Zhang on 4/5/16.
 //  Copyright © 2016 David Zhang. All rights reserved.
 //
-
-#include <iostream>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-
-#include <string>
+#include "socket_tcp.hpp"
 using namespace std;
 
 const string _port = "3490";
@@ -66,16 +58,13 @@ int main(int argc, const char * argv[]) {
     string msg;
     while (getline(cin, msg)) {
         /* send the message, use endline as deliminator */
-        int _size = msg.size() + 1; // null-terminated character
-        msg = to_string(_size) + '-' + msg;
-
-        if ((send(soc_client, msg.c_str(), msg.size(), 0)) == -1) {
-            fprintf(stderr, "send failed\n");
+        if (msg.empty()) {
+            continue;
         }
+        tcp_send(soc_client, msg);
     }
 
     
     close(soc_client);
-    freeaddrinfo(res); // free the linked list
     return 0;
 }
